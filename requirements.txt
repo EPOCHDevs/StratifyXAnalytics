@@ -1,0 +1,6 @@
+aiohttp
+pyfolio-reloaded
+pyyaml
+msgpack
+fastapi
+uvicorn

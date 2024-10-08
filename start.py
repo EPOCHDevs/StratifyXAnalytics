@@ -140,4 +140,4 @@ async def analytics(campaign_id: str, request: Request):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="localhost", port=9000, log_level="info")
+    uvicorn.run(app, port=9000, log_level="info")
