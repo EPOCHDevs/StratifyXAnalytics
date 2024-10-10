@@ -1,3 +1,4 @@
+import typing
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -16,8 +17,17 @@ from positions import positions_tear_sheet
 from returns import returns_tear_sheet
 from transactions import txn_tear_sheets
 from round_trips import round_trips_tear_sheet
+import orjson
 
-app = FastAPI()
+
+class ORJSONResponse(JSONResponse):
+    media_type = "application/json"
+
+    def render(self, content: typing.Any) -> bytes:
+        return orjson.dumps(content, option=orjson.OPT_SERIALIZE_NUMPY)
+
+
+app = FastAPI(default_response_class=ORJSONResponse)
 
 # Add CORS middleware
 app.add_middleware(
@@ -85,7 +95,7 @@ async def returns_and_periods(campaign_id: str, request: Request):
 
     futures_interesting_periods = await interesting_periods(daily_returns, factor_returns)
 
-    return JSONResponse(content=dict(
+    return ORJSONResponse(content=dict(
         returns=await future_returns,
         interesting_periods=futures_interesting_periods
     ))
@@ -129,15 +139,16 @@ async def analytics(campaign_id: str, request: Request):
     round_trip = await fetch_round_trip(stratifyx_server_url, campaign_id)
     futures_round_trip = round_trips_tear_sheet(round_trip, daily_returns, position, sector_mappings)
 
-    return JSONResponse(content=dict(
+    content = dict(
         position=position_result,
         txn=await futures_txn,
         round_trip=await futures_round_trip
-    ))
+    )
+    return ORJSONResponse(content=content)
 
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, port=9000, log_level="info")
+    uvicorn.run(app, port=9006, log_level="info")

@@ -4,3 +4,6 @@ pyyaml
 msgpack
 fastapi
 uvicorn
+fastparquet
+s3fs
+orjson
