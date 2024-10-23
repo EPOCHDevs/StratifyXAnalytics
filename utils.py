@@ -13,7 +13,7 @@ async def async_get_campaign(server, campaign_id):
         async with aiohttp.ClientSession() as session:
             async with session.get(f"{server}/campaign/{campaign_id}") as response:
                 response.raise_for_status()
-                return (await response.json())['item']
+                return await response.json()
     except aiohttp.ClientError as e:
         logging.error(f"Request failed: {e}")
     except Exception as e:

@@ -54,4 +54,6 @@ async def txn_tear_sheets(orders, positions, base_tf, bin_minutes, tz):
         txn_time.trade_value = txn_time.trade_value.fillna(0) / trade_value_sum
 
         txn_dict['txn_time_dist'] = txn_time[['time_str', 'trade_value']].to_records(index=False).tolist()
+    else:
+        txn_dict['txn_time_dist'] = []
     return txn_dict

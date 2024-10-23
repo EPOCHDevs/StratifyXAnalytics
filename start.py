@@ -19,6 +19,33 @@ from transactions import txn_tear_sheets
 from round_trips import round_trips_tear_sheet
 import orjson
 
+DEFAULT_ROUND_TRIPS = {
+    "stats": {
+        "columns": [],
+        "summary": [],
+        "pnl": [],
+        "duration": [],
+        "returns": [],
+        "symbols": []
+    },
+    "pnl_attribution": [],
+    "pnl_attribution_by_sector": [],
+    "round_trip_lifetimes": {
+        "symbols": [],
+        "data": [],
+    },
+    "profitability": {
+        "stat": [],
+        "lower_perc": 0,
+        "lower_plot": 0,
+        "upper_perc": 0,
+        "upper_plot": 0,
+    },
+    "holding_times": [],
+    "pnl": [],
+    "returns": [],
+}
+
 
 class ORJSONResponse(JSONResponse):
     media_type = "application/json"
@@ -137,12 +164,15 @@ async def analytics(campaign_id: str, request: Request):
 
     daily_returns = utils.get_returns(account, base_tf, None)
     round_trip = await fetch_round_trip(stratifyx_server_url, campaign_id)
-    futures_round_trip = round_trips_tear_sheet(round_trip, daily_returns, position, sector_mappings)
+
+    futures_round_trip = None
+    if round_trip is not None:
+        futures_round_trip = round_trips_tear_sheet(round_trip, daily_returns, position, sector_mappings)
 
     content = dict(
         position=position_result,
         txn=await futures_txn,
-        round_trip=await futures_round_trip
+        round_trip=await futures_round_trip if round_trip is not None else DEFAULT_ROUND_TRIPS
     )
     return ORJSONResponse(content=content)
 
